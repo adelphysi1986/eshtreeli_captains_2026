@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "78034362788",
+    "project_id": "captains-6f267",
+    "storage_bucket": "captains-6f267.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:78034362788:android:ac045c502a95a497742131",
+        "android_client_info": {
+          "package_name": "com.eshtreeli.captains"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBYGLe9EEH4EqlDCoZwAGlVR_cDAWMHAZ0"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
