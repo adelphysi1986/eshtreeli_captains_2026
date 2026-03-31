@@ -179,8 +179,8 @@ class DeleteAccountInfoPage extends StatelessWidget {
               SizedBox(height: 15),
               InkWell(
                 onTap: () async {
-                  final url =
-                      Uri.parse("http://192.168.1.6:5000/delete-account");
+                  final url = Uri.parse(
+                      "https://eshtreeli-backend-2026-1.onrender.com/delete-account");
                   if (await canLaunchUrl(url)) {
                     await launchUrl(url, mode: LaunchMode.externalApplication);
                   } else {
@@ -188,7 +188,7 @@ class DeleteAccountInfoPage extends StatelessWidget {
                   }
                 },
                 child: Text(
-                  "http://192.168.1.6:5000/delete-account",
+                  "https://eshtreeli-backend-2026-1.onrender.com/delete-account",
                   style: TextStyle(
                     fontSize: 18,
                     fontWeight: FontWeight.bold,
@@ -245,7 +245,8 @@ Future<void> DeleteAccountIOS(BuildContext context) async {
 
   try {
     final response = await http.put(
-      Uri.parse("http://192.168.1.6:5000/api/user/update-phone"),
+      Uri.parse(
+          "https://eshtreeli-backend-2026-1.onrender.com/api/user/update-phone"),
       headers: {
         "Content-Type": "application/json",
         "Authorization": "Bearer $token",

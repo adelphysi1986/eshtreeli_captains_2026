@@ -13,6 +13,16 @@ void onStart(ServiceInstance service) async {
 
   print("🔥 SERVICE STARTED");
 
+  // 👇🔥 أهم سطرين (كانوا ناقصين عندك)
+  if (service is AndroidServiceInstance) {
+    service.setAsForegroundService();
+
+    service.setForegroundNotificationInfo(
+      title: "Eshtreeli",
+      content: "جاري مشاركة موقعك",
+    );
+  }
+
   Timer.periodic(const Duration(seconds: 300), (timer) async {
     try {
       final prefs = await SharedPreferences.getInstance();
@@ -23,7 +33,8 @@ void onStart(ServiceInstance service) async {
       final pos = await Geolocator.getCurrentPosition();
 
       await http.post(
-        Uri.parse("http://192.168.1.6:5000/api/captain/location"),
+        Uri.parse(
+            "https://eshtreeli-backend-2026-1.onrender.com/api/captain/location"),
         headers: {
           "Content-Type": "application/json",
           "Authorization": "Bearer $token"

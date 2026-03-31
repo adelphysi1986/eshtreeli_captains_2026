@@ -72,7 +72,8 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
     final userId = prefs.getString('id') ?? "";
 
     final res = await http.get(
-      Uri.parse("http://192.168.1.6:5000/api/notifications/$userId"),
+      Uri.parse(
+          "https://eshtreeli-backend-2026-1.onrender.com/api/notifications/$userId"),
       headers: {"Content-Type": "application/json"},
     );
 

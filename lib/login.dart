@@ -37,7 +37,8 @@ class _LoginPhonePageState extends State<LoginPhonePage> {
 
     try {
       final response = await http.post(
-        Uri.parse('http://192.168.1.6:5000/api/auth/login-phone'),
+        Uri.parse(
+            'https://eshtreeli-backend-2026-1.onrender.com/api/auth/login-phone'),
         headers: {'Content-Type': 'application/json'},
         body: jsonEncode({
           'phone': phone,

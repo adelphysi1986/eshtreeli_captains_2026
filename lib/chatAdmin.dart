@@ -13,7 +13,7 @@ late IO.Socket socket;
 
 void initSocket() {
   socket = IO.io(
-    'http://192.168.1.6:5000',
+    'https://eshtreeli-backend-2026-1.onrender.com',
     IO.OptionBuilder()
         .setTransports(['websocket'])
         .disableAutoConnect()
@@ -104,8 +104,8 @@ class _ChatPageState extends State<ChatPage> {
     final prefs = await SharedPreferences.getInstance();
     myId = prefs.getString('id');
 
-    final res = await http
-        .get(Uri.parse("http://192.168.1.6:5000/api/users/last-admin"));
+    final res = await http.get(Uri.parse(
+        "https://eshtreeli-backend-2026-1.onrender.com/api/users/last-admin"));
 
     if (res.statusCode == 200) {
       final data = jsonDecode(res.body);
@@ -129,7 +129,8 @@ class _ChatPageState extends State<ChatPage> {
     final token = prefs.getString('token');
 
     final res = await http.get(
-      Uri.parse("http://192.168.1.6:5000/api/chat/$roomId"),
+      Uri.parse(
+          "https://eshtreeli-backend-2026-1.onrender.com/api/chat/$roomId"),
       headers: {
         "Authorization": "Bearer $token",
         "Content-Type": "application/json",
@@ -228,7 +229,8 @@ class _ChatPageState extends State<ChatPage> {
 
     var request = http.MultipartRequest(
       "POST",
-      Uri.parse("http://192.168.1.6:5000/api/chat/upload-audio"),
+      Uri.parse(
+          "https://eshtreeli-backend-2026-1.onrender.com/api/chat/upload-audio"),
     );
 
     request.headers['Authorization'] = "Bearer $token";
@@ -246,7 +248,7 @@ class _ChatPageState extends State<ChatPage> {
 
   Future<void> _playAudio(String url) async {
     try {
-      final fullUrl = "http://192.168.1.6:5000$url";
+      final fullUrl = "https://eshtreeli-backend-2026-1.onrender.com$url";
 
       if (_currentlyPlayingUrl == fullUrl &&
           _playerState == PlayerState.playing) {
@@ -349,7 +351,7 @@ class _ChatPageState extends State<ChatPage> {
                             ? Builder(
                                 builder: (context) {
                                   final fullUrl =
-                                      "http://192.168.1.6:5000${msg.audioUrl}";
+                                      "https://eshtreeli-backend-2026-1.onrender.com${msg.audioUrl}";
                                   final isCurrent =
                                       _currentlyPlayingUrl == fullUrl;
 

@@ -50,8 +50,8 @@ class Policey {
 
 // ================== API Functions ==================
 Future<List<City>> fetchMainPlace() async {
-  final response =
-      await http.get(Uri.parse('http://192.168.1.6:5000/api/main-areas'));
+  final response = await http.get(Uri.parse(
+      'https://eshtreeli-backend-2026-1.onrender.com/api/main-areas'));
   if (response.statusCode == 200) {
     final List<dynamic> data = jsonDecode(response.body);
     return data.map((e) => City(id: e['_id'], name: e['name'])).toList();
@@ -62,7 +62,8 @@ Future<List<City>> fetchMainPlace() async {
 
 Future<List<Reagion>> fetchSubAreas(String mainAreaId) async {
   final response = await http.post(
-    Uri.parse('http://192.168.1.6:5000/api/sub-areas-by-main'),
+    Uri.parse(
+        'https://eshtreeli-backend-2026-1.onrender.com/api/sub-areas-by-main'),
     headers: <String, String>{'Content-Type': 'application/json'},
     body: jsonEncode({'mainAreaId': mainAreaId}),
   );
@@ -85,14 +86,15 @@ Future<void> fitchSignup(
   String subArea,
 ) async {
   final response = await http.post(
-    Uri.parse('http://192.168.1.6:5000/api/auth/register'),
+    Uri.parse(
+        'https://eshtreeli-backend-2026-1.onrender.com/api/auth/register'),
     headers: {'Content-Type': 'application/json'},
     body: jsonEncode({
       'name': name,
       'email': '$name@gmail.com', // ايميل ثابت
       'password': password,
       'phone': phone,
-      'role': 'captain',
+      'role': 'user',
       'location': mainArea,
       'subArea': subArea,
     }),

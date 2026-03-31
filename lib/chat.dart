@@ -78,7 +78,8 @@ class _OrderChatPageState extends State<OrderChatPage> {
 
     var request = http.MultipartRequest(
       "POST",
-      Uri.parse("http://192.168.1.6:5000/api/order-chat/upload-image"),
+      Uri.parse(
+          "https://eshtreeli-backend-2026-1.onrender.com/api/order-chat/upload-image"),
     );
 
     request.headers['Authorization'] = "Bearer $token";
@@ -102,7 +103,7 @@ class _OrderChatPageState extends State<OrderChatPage> {
     myId = prefs.getString("id") ?? "";
 
     socket = IO.io(
-      "http://192.168.1.6:5000",
+      "https://eshtreeli-backend-2026-1.onrender.com",
       IO.OptionBuilder().setTransports(['websocket']).build(),
     );
 
@@ -128,7 +129,8 @@ class _OrderChatPageState extends State<OrderChatPage> {
     final token = prefs.getString("token");
 
     final res = await http.get(
-      Uri.parse("http://192.168.1.6:5000/api/order-chat/${widget.orderId}"),
+      Uri.parse(
+          "https://eshtreeli-backend-2026-1.onrender.com/api/order-chat/${widget.orderId}"),
       headers: {"Authorization": "Bearer $token"},
     );
 
@@ -186,7 +188,8 @@ class _OrderChatPageState extends State<OrderChatPage> {
 
     var request = http.MultipartRequest(
       "POST",
-      Uri.parse("http://192.168.1.6:5000/api/order-chat/upload-audio"),
+      Uri.parse(
+          "https://eshtreeli-backend-2026-1.onrender.com/api/order-chat/upload-audio"),
     );
 
     request.headers['Authorization'] = "Bearer $token";
@@ -205,7 +208,7 @@ class _OrderChatPageState extends State<OrderChatPage> {
 
   Future<void> _playAudio(String url) async {
     try {
-      final fullUrl = "http://192.168.1.6:5000$url";
+      final fullUrl = "https://eshtreeli-backend-2026-1.onrender.com$url";
 
       if (_currentlyPlayingUrl == fullUrl &&
           _playerState == PlayerState.playing) {
@@ -273,7 +276,7 @@ class _OrderChatPageState extends State<OrderChatPage> {
             Expanded(
               child: ListView.builder(
                 controller: scroll,
-                padding: const EdgeInsets.all(12),
+                padding: const EdgeInsets.all(10),
                 itemCount: messages.length,
                 itemBuilder: (c, i) {
                   final m = messages[i];
@@ -284,12 +287,12 @@ class _OrderChatPageState extends State<OrderChatPage> {
                         isMe ? Alignment.centerRight : Alignment.centerLeft,
                     child: Container(
                       margin: const EdgeInsets.symmetric(vertical: 6),
-                      padding: const EdgeInsets.all(8),
+                      padding: const EdgeInsets.all(5),
                       constraints: BoxConstraints(
                           maxWidth: MediaQuery.of(context).size.width * .7),
                       decoration: BoxDecoration(
                         color: isMe ? Colors.green : Colors.grey.shade300,
-                        borderRadius: BorderRadius.circular(12),
+                        borderRadius: BorderRadius.circular(10),
                       ),
                       child: m["type"] == "image"
                           ? GestureDetector(
@@ -298,19 +301,40 @@ class _OrderChatPageState extends State<OrderChatPage> {
                                   context: context,
                                   builder: (_) => Dialog(
                                     child: Image.network(
-                                      "http://192.168.1.6:5000${m["imageUrl"]}",
+                                      "https://eshtreeli-backend-2026-1.onrender.com${m["imageUrl"]}",
                                       fit: BoxFit.contain,
+                                      errorBuilder:
+                                          (context, error, stackTrace) {
+                                        return const SizedBox(
+                                          height: 200,
+                                          child: Center(
+                                            child: Text(
+                                                "الصورة غالبا مؤقتة والان هي غير متاحة"),
+                                          ),
+                                        );
+                                      },
                                     ),
                                   ),
                                 );
                               },
                               child: ClipRRect(
-                                borderRadius: BorderRadius.circular(12),
+                                borderRadius: BorderRadius.circular(8),
                                 child: Image.network(
-                                  "http://192.168.1.6:5000${m["imageUrl"]}",
+                                  "https://eshtreeli-backend-2026-1.onrender.com${m["imageUrl"]}",
                                   width: 160,
                                   height: 160,
                                   fit: BoxFit.cover,
+                                  errorBuilder: (context, error, stackTrace) {
+                                    return Container(
+                                      width: 160,
+                                      height: 160,
+                                      color: Colors.grey.shade300,
+                                      child: const Center(
+                                        child: Icon(Icons.image_not_supported,
+                                            size: 40),
+                                      ),
+                                    );
+                                  },
                                 ),
                               ),
                             )
@@ -318,7 +342,7 @@ class _OrderChatPageState extends State<OrderChatPage> {
                               ? Builder(
                                   builder: (_) {
                                     final fullUrl =
-                                        "http://192.168.1.6:5000${m["audioUrl"]}";
+                                        "https://eshtreeli-backend-2026-1.onrender.com${m["audioUrl"]}";
                                     final isCurrent =
                                         _currentlyPlayingUrl == fullUrl;
 
@@ -327,6 +351,9 @@ class _OrderChatPageState extends State<OrderChatPage> {
                                         Expanded(
                                           child: Column(
                                             children: [
+                                              SizedBox(
+                                                height: 12,
+                                              ),
                                               Directionality(
                                                 textDirection:
                                                     TextDirection.ltr,
@@ -361,22 +388,27 @@ class _OrderChatPageState extends State<OrderChatPage> {
                                                       : null,
                                                 ),
                                               ),
-                                              Text(
-                                                isCurrent
-                                                    ? _formatDuration(_position)
-                                                    : "00:00",
-                                                style: TextStyle(
-                                                  fontSize: 11,
-                                                  color: isMe
-                                                      ? Colors.white
-                                                      : Colors.black,
-                                                ),
+                                              Row(
+                                                children: [
+                                                  Text(
+                                                    isCurrent
+                                                        ? _formatDuration(
+                                                            _position)
+                                                        : "00:00",
+                                                    style: TextStyle(
+                                                      fontSize: 11,
+                                                      color: isMe
+                                                          ? Colors.white
+                                                          : Colors.black,
+                                                    ),
+                                                  ),
+                                                ],
                                               ),
                                             ],
                                           ),
                                         ),
                                         IconButton(
-                                          iconSize: 30,
+                                          iconSize: 35,
                                           icon: Icon(
                                             isCurrent &&
                                                     _playerState ==
@@ -458,7 +490,7 @@ class _OrderChatPageState extends State<OrderChatPage> {
                 ],
               ),
             ),
-            const SizedBox(height: 50),
+            const SizedBox(height: 5),
           ],
         ),
       ),

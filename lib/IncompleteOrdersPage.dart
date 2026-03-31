@@ -32,7 +32,7 @@ class _CaptainOrdersPageState extends State<CaptainOrdersPage> {
     final token = prefs.getString("token") ?? "";
 
     final url = Uri.parse(
-      "http://192.168.1.6:5000/api/orders/$orderId/cancel-by-captain",
+      "https://eshtreeli-backend-2026-1.onrender.com/api/orders/$orderId/cancel-by-captain",
     );
 
     try {
@@ -117,7 +117,7 @@ class _CaptainOrdersPageState extends State<CaptainOrdersPage> {
     final token = prefs.getString("token") ?? "";
 
     final url = Uri.parse(
-        "http://192.168.1.6:5000/api/orders/$orderId/status"); // تأكد أن الـ endpoint صحيح
+        "https://eshtreeli-backend-2026-1.onrender.com/api/orders/$orderId/status"); // تأكد أن الـ endpoint صحيح
 
     try {
       final response = await http.put(
@@ -282,7 +282,7 @@ class _CaptainOrdersPageState extends State<CaptainOrdersPage> {
     final token = prefs.getString("token") ?? "";
 
     final url = Uri.parse(
-      "http://192.168.1.6:5000/api/orders/$orderId/delivering",
+      "https://eshtreeli-backend-2026-1.onrender.com/api/orders/$orderId/delivering",
     );
 
     final response = await http.put(
@@ -315,7 +315,8 @@ class _CaptainOrdersPageState extends State<CaptainOrdersPage> {
     setState(() => isLoading = true);
     final prefs = await SharedPreferences.getInstance();
     final token = prefs.getString("token") ?? "";
-    final url = Uri.parse("http://192.168.1.6:5000/api/orders/captain");
+    final url = Uri.parse(
+        "https://eshtreeli-backend-2026-1.onrender.com/api/orders/captain");
 
     try {
       final response = await http.get(url, headers: {
@@ -606,7 +607,7 @@ class _CaptainOrdersPageState extends State<CaptainOrdersPage> {
                                                             BorderRadius
                                                                 .circular(8),
                                                         child: Image.network(
-                                                          "http://192.168.1.6:5000$image",
+                                                          "https://eshtreeli-backend-2026-1.onrender.com$image",
                                                           width: 55,
                                                           height: 55,
                                                           fit: BoxFit.cover,
@@ -778,7 +779,9 @@ class _CaptainOrdersPageState extends State<CaptainOrdersPage> {
                                                       context: context,
                                                       builder: (_) => Dialog(
                                                         backgroundColor:
-                                                            Colors.black,
+                                                            const Color
+                                                                .fromARGB(255,
+                                                                255, 255, 255),
                                                         insetPadding:
                                                             EdgeInsets.zero,
                                                         child: GestureDetector(
@@ -786,8 +789,28 @@ class _CaptainOrdersPageState extends State<CaptainOrdersPage> {
                                                               Navigator.pop(
                                                                   context),
                                                           child: Image.network(
-                                                            "http://192.168.1.6:5000$img",
+                                                            "https://eshtreeli-backend-2026-1.onrender.com$img",
                                                             fit: BoxFit.contain,
+                                                            errorBuilder:
+                                                                (context, error,
+                                                                    stackTrace) {
+                                                              return const SizedBox(
+                                                                height: 200,
+                                                                child: Center(
+                                                                  child: Text(
+                                                                    "الصورة غالبا مؤقتة والان غير متاحة",
+                                                                    style: TextStyle(
+                                                                        color: Color.fromARGB(
+                                                                            255,
+                                                                            0,
+                                                                            0,
+                                                                            0),
+                                                                        fontSize:
+                                                                            16),
+                                                                  ),
+                                                                ),
+                                                              );
+                                                            },
                                                           ),
                                                         ),
                                                       ),
@@ -798,10 +821,31 @@ class _CaptainOrdersPageState extends State<CaptainOrdersPage> {
                                                         BorderRadius.circular(
                                                             10),
                                                     child: Image.network(
-                                                      "http://192.168.1.6:5000$img",
+                                                      "https://eshtreeli-backend-2026-1.onrender.com$img",
                                                       width: 100,
                                                       height: 100,
                                                       fit: BoxFit.cover,
+                                                      errorBuilder: (context,
+                                                          error, stackTrace) {
+                                                        return Container(
+                                                          width: 100,
+                                                          height: 100,
+                                                          alignment:
+                                                              Alignment.center,
+                                                          color: Colors
+                                                              .grey.shade200,
+                                                          child: const Text(
+                                                            "لا يوجد صورة",
+                                                            style: TextStyle(
+                                                              fontSize: 12,
+                                                              color: Colors
+                                                                  .black54,
+                                                            ),
+                                                            textAlign: TextAlign
+                                                                .center,
+                                                          ),
+                                                        );
+                                                      },
                                                     ),
                                                   ),
                                                 ));
@@ -1033,7 +1077,7 @@ class _CaptainOrdersPageState extends State<CaptainOrdersPage> {
                                                 prefs.getString("token") ?? "";
 
                                             final url = Uri.parse(
-                                              "http://192.168.1.6:5000/api/orders/${order['_id']}/status",
+                                              "https://eshtreeli-backend-2026-1.onrender.com/api/orders/${order['_id']}/status",
                                             );
 
                                             try {

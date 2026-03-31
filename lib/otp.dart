@@ -36,7 +36,8 @@ class _otpState extends State<otp> {
 
   fitchsendcode() async {
     final response = await http.post(
-      Uri.parse('http://192.168.1.6:5000/api/send_code_v'),
+      Uri.parse(
+          'https://eshtreeli-backend-2026-1.onrender.com/api/send_code_v'),
       headers: <String, String>{'Content-Type': 'application/json'},
       body: jsonEncode(<String, dynamic>{
         'customers_mobile': widget.phone,
@@ -56,7 +57,8 @@ class _otpState extends State<otp> {
       isloading = true;
     });
     final response = await http.post(
-      Uri.parse('http://192.168.1.6:5000/api/check_code_ative_user'),
+      Uri.parse(
+          'https://eshtreeli-backend-2026-1.onrender.com/api/check_code_ative_user'),
       headers: <String, String>{'Content-Type': 'application/json'},
       body: jsonEncode(<String, dynamic>{
         'customers_mobile': widget.phone,

@@ -13,6 +13,7 @@ import 'package:flutter/material.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:http/http.dart' as http;
 import 'package:firebase_messaging/firebase_messaging.dart';
+import 'package:permission_handler/permission_handler.dart' hide ServiceStatus;
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:flutter_rating_bar/flutter_rating_bar.dart';
@@ -58,7 +59,7 @@ class _homeState extends State<home> {
   String idUser = '';
   void initSocket() {
     socket = IO.io(
-      'http://192.168.1.6:5000',
+      'https://eshtreeli-backend-2026-1.onrender.com',
       IO.OptionBuilder()
           .setTransports(['websocket'])
           .disableAutoConnect()
@@ -135,6 +136,7 @@ class _homeState extends State<home> {
       if (enabled && gpsDialogVisible && mounted) {
         gpsDialogVisible = false;
         Navigator.of(context, rootNavigator: true).pop();
+        startBackground();
       }
     });
   }
@@ -183,8 +185,7 @@ class _homeState extends State<home> {
       final idUser = prefs.getString('id');
 
       if (idUser == null) return;
-
-      final token = await FirebaseMessaging.instance.getToken();
+      final token = prefs.getString('notitoken');
 
       if (token == null) {
         print("FCM token still null");
@@ -192,7 +193,8 @@ class _homeState extends State<home> {
       }
 
       await http.post(
-        Uri.parse('http://192.168.1.6:5000/api/save_token_expo'),
+        Uri.parse(
+            'https://eshtreeli-backend-2026-1.onrender.com/api/save_token_expo'),
         headers: {'Content-Type': 'application/json'},
         body: jsonEncode({'id': idUser, 'token': token}),
       );
@@ -237,7 +239,7 @@ class _homeState extends State<home> {
         isLoading = true;
       });
       final response = await http.get(
-        Uri.parse('http://192.168.1.6:5000/api/auth/me'),
+        Uri.parse('https://eshtreeli-backend-2026-1.onrender.com/api/auth/me'),
         headers: {
           'Content-Type': 'application/json',
           'Authorization': 'Bearer $token',
@@ -296,7 +298,8 @@ class _homeState extends State<home> {
         return;
       }
       final response = await http.get(
-        Uri.parse("http://192.168.1.6:5000/api/orders/new-orders"),
+        Uri.parse(
+            "https://eshtreeli-backend-2026-1.onrender.com/api/orders/new-orders"),
         headers: {
           "Content-Type": "application/json",
           "Authorization": "Bearer $token",
@@ -346,27 +349,35 @@ class _homeState extends State<home> {
     }
   }
 
-  void startBackground() async {
+  Future<void> startBackground() async {
     final service = FlutterBackgroundService();
+
+    bool isRunning = await service.isRunning();
+
+    if (isRunning) {
+      print("⚠️ Service already running");
+      return;
+    }
 
     await service.configure(
       androidConfiguration: AndroidConfiguration(
         onStart: onStart,
         isForegroundMode: true,
-        autoStart: true,
+        autoStart: false,
         foregroundServiceNotificationId: 888,
         initialNotificationTitle: "Eshtreeli",
         initialNotificationContent: "جاري مشاركة موقعك",
       ),
       iosConfiguration: IosConfiguration(
-        autoStart: true,
+        autoStart: false,
       ),
     );
 
     service.startService();
+
+    print("🚀 START SERVICE CALLED");
   }
 
-  @override
   @override
   void initState() {
     super.initState();
@@ -382,7 +393,8 @@ class _homeState extends State<home> {
     startGpsWatcher();
     fetchUser();
     saveToken();
-    startBackground();
+    await Permission.notification.request();
+    //  startBackground();
   }
 
   @override
@@ -845,7 +857,7 @@ class _homeState extends State<home> {
                                                         BorderRadius.circular(
                                                             8),
                                                     child: Image.network(
-                                                      'http://192.168.1.6:5000$imgUrl',
+                                                      'https://eshtreeli-backend-2026-1.onrender.com$imgUrl',
                                                       fit: BoxFit.cover,
                                                       errorBuilder: (context,
                                                               error,
@@ -878,7 +890,7 @@ class _homeState extends State<home> {
                                             try {
                                               final response = await http.put(
                                                 Uri.parse(
-                                                  "http://192.168.1.6:5000/api/orders/${order['_id']}/accept",
+                                                  "https://eshtreeli-backend-2026-1.onrender.com/api/orders/${order['_id']}/accept",
                                                 ),
                                                 headers: {
                                                   "Content-Type":

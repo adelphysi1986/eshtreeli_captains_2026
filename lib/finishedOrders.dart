@@ -36,7 +36,8 @@ class _finishedOrdersState extends State<finishedOrders> {
     setState(() => isLoading = true);
     final prefs = await SharedPreferences.getInstance();
     final token = prefs.getString("token") ?? "";
-    final url = Uri.parse("http://192.168.1.6:5000/api/orders/captainfinish");
+    final url = Uri.parse(
+        "https://eshtreeli-backend-2026-1.onrender.com/api/orders/captainfinish");
 
     try {
       final response = await http.get(url, headers: {
@@ -271,7 +272,7 @@ class _finishedOrdersState extends State<finishedOrders> {
                                                               Navigator.pop(
                                                                   context),
                                                           child: Image.network(
-                                                            "http://192.168.1.6:5000$img",
+                                                            "https://eshtreeli-backend-2026-1.onrender.com$img",
                                                             fit: BoxFit.contain,
                                                           ),
                                                         ),
@@ -283,7 +284,7 @@ class _finishedOrdersState extends State<finishedOrders> {
                                                         BorderRadius.circular(
                                                             10),
                                                     child: Image.network(
-                                                      "http://192.168.1.6:5000$img",
+                                                      "https://eshtreeli-backend-2026-1.onrender.com$img",
                                                       width: 100,
                                                       height: 100,
                                                       fit: BoxFit.cover,
