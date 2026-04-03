@@ -23,8 +23,8 @@ android {
         applicationId = "com.eshtreeli.captains"
         minSdk = flutter.minSdkVersion
         targetSdk = 36
-        versionCode = 31
-        versionName = "2.1.5"
+        versionCode = 32
+        versionName = "2.1.6"
     }
 
     signingConfigs {

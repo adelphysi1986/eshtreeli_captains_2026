@@ -5,6 +5,7 @@ import 'dart:io';
 import 'package:eshtreeli_captains_flutter/IncompleteOrdersPage.dart';
 import 'package:eshtreeli_captains_flutter/about.dart';
 import 'package:eshtreeli_captains_flutter/finishedOrders.dart';
+import 'package:eshtreeli_captains_flutter/main.dart';
 import 'package:eshtreeli_captains_flutter/notifications.dart';
 import 'package:eshtreeli_captains_flutter/profile.dart';
 import 'package:eshtreeli_captains_flutter/signup.dart';
@@ -29,6 +30,7 @@ class home extends StatefulWidget {
 }
 
 class _homeState extends State<home> {
+  StreamSubscription? notificationSub;
   String? expandedOrderId;
   late IO.Socket socket;
   StreamSubscription<Position>? positionSub;
@@ -381,7 +383,13 @@ class _homeState extends State<home> {
   @override
   void initState() {
     super.initState();
+    notificationSub = notificationStream.stream.listen((_) async {
+      print("🔥 جا إشعار - رح نحدث البيانات");
 
+      await Future.delayed(Duration(seconds: 2)); // 👈 هون التعديل
+
+      await fetchNewOrdersCaptain();
+    });
     WidgetsBinding.instance.addPostFrameCallback((_) {
       initAfterUI();
     });
@@ -403,7 +411,7 @@ class _homeState extends State<home> {
     positionSub?.cancel();
     socket.dispose();
     gpsTimer?.cancel();
-
+    notificationSub?.cancel();
     super.dispose();
   }
 
@@ -665,7 +673,8 @@ class _homeState extends State<home> {
                                     ? order['endLocation']
                                     : "غير محدد";
 
-                            num deliveryPrice = order['deliveryPrice'] ?? 0;
+                            num deliveryPrice =
+                                (order['deliveryPrice'] ?? 0).round();
 
                             Widget deliveryPriceWidget = deliveryPrice == 0
                                 ? const Text(

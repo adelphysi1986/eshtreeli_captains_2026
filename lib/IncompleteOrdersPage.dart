@@ -457,7 +457,8 @@ class _CaptainOrdersPageState extends State<CaptainOrdersPage> {
                         // final userName = order['userName'] ?? "";
                         final userPhone = order['userPhone'] ?? "";
                         final extraPhone = order['extraPhone'] ?? "";
-                        final deliveryPrice = order['deliveryPrice'] ?? "";
+                        final deliveryPrice =
+                            order['deliveryPrice'].round() ?? "";
                         final sum = order['sum'] ?? "";
                         final orderType = order['orderType'] ?? "";
 
@@ -607,7 +608,7 @@ class _CaptainOrdersPageState extends State<CaptainOrdersPage> {
                                                             BorderRadius
                                                                 .circular(8),
                                                         child: Image.network(
-                                                          "https://eshtreeli-backend-2026-1.onrender.com$image",
+                                                          "$image",
                                                           width: 55,
                                                           height: 55,
                                                           fit: BoxFit.cover,

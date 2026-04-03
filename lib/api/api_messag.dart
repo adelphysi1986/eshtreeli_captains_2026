@@ -1,7 +1,9 @@
 import 'dart:convert';
 
+import 'package:eshtreeli_captains_flutter/home.dart';
 import 'package:eshtreeli_captains_flutter/main.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
+import 'package:flutter/material.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'dart:async';
@@ -78,7 +80,7 @@ class firebaseApi {
       await _flutterLocalNotificationsPlugin.initialize(
         initializationSettings,
         onDidReceiveNotificationResponse: onNotificationTap,
-        onDidReceiveBackgroundNotificationResponse: onNotificationTap,
+        onDidReceiveBackgroundNotificationResponse: null,
       );
     } catch (e) {
       print('❌ Error in localNoti(): $e');
@@ -87,8 +89,16 @@ class firebaseApi {
 
   /// عند الضغط على الإشعار
   static void onNotificationTap(NotificationResponse notificationResponse) {
-    navigatorKey.currentState!
-        .pushNamed("/message", arguments: notificationResponse);
+    print("📲 تم الضغط على الإشعار");
+
+    navigatorKey.currentState!.pushAndRemoveUntil(
+      MaterialPageRoute(builder: (context) => home()), // 👈 هون الهوم
+      (route) => false,
+    );
+
+    Future.delayed(Duration(milliseconds: 500), () {
+      notificationStream.add(null); // 👈 يحدث البيانات
+    });
   }
 
   /// إظهار إشعار بسيط

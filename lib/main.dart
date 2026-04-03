@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:convert';
 
 import 'package:eshtreeli_captains_flutter/api/api_messag.dart';
@@ -9,9 +10,11 @@ import 'package:flutter/material.dart';
 
 // 👇 مهم
 import 'package:flutter_background_service/flutter_background_service.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'background_location.dart';
 
 final navigatorKey = GlobalKey<NavigatorState>();
+final notificationStream = StreamController<void>.broadcast();
 
 Future<void> _firbaseBackGroundMessaging(RemoteMessage message) async {
   await Firebase.initializeApp();
@@ -53,22 +56,28 @@ Future<void> main() async {
     print("Firebase initialization failed: $e");
   }
 
-  await firebaseApi.init();
-  await firebaseApi.localNoti();
+  final prefs = await SharedPreferences.getInstance();
+  final token = prefs.getString('notitoken');
 
+  // ✅ فقط إذا ما في توكن → استدعي init
+  if (token == null || token.isEmpty) {
+    await firebaseApi.init();
+  } else {
+    print("✅ Using saved token");
+    await firebaseApi.localNoti();
+  }
   FirebaseMessaging.onBackgroundMessage(_firbaseBackGroundMessaging);
 
   FirebaseMessaging.onMessage.listen((RemoteMessage message) {
     String payloadData = jsonEncode(message.data);
     print('got a message in foreground');
+    notificationStream.add(null);
 
-    if (message.notification != null) {
-      firebaseApi.showSimpleNoti(
-        title: message.notification!.title!,
-        body: message.notification!.body!,
-        payload: payloadData,
-      );
-    }
+    firebaseApi.showSimpleNoti(
+      title: message.notification?.title ?? '',
+      body: message.notification?.body ?? '',
+      payload: jsonEncode(message.data),
+    );
   });
 
   runApp(MyApp());
