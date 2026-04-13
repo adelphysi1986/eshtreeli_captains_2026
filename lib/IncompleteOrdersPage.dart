@@ -236,7 +236,7 @@ class _CaptainOrdersPageState extends State<CaptainOrdersPage> {
                       // ✅ تحقق من الأرقام فقط
                       int? deliveryPrice = needDeliveryPrice
                           ? int.tryParse(deliveryController.text)
-                          : order['deliveryPrice'];
+                          : order['deliveryPrice'].round();
 
                       int? sum = int.tryParse(sumController.text);
 
