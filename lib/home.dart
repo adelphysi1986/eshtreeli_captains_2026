@@ -421,6 +421,23 @@ class _homeState extends State<home> {
       appBar: AppBar(
         automaticallyImplyLeading: false,
       ),
+      floatingActionButton: FloatingActionButton.extended(
+        backgroundColor: Colors.green,
+        icon: Icon(Icons.local_taxi, color: Colors.white),
+        label: Text(
+          "طلبات قيد الإنجاز",
+          style: TextStyle(color: Colors.white),
+        ),
+        onPressed: () {
+          Navigator.push(
+            context,
+            MaterialPageRoute(
+              builder: (_) => CaptainOrdersPage(),
+            ),
+          );
+        },
+      ),
+      floatingActionButtonLocation: FloatingActionButtonLocation.endFloat,
       endDrawer: Drawer(
         child: Container(
           color: const Color.fromARGB(255, 248, 248, 248),
@@ -801,11 +818,6 @@ class _homeState extends State<home> {
                                           crossAxisAlignment: CrossAxisAlignment
                                               .start, // يتيح امتداد النص رأسياً
                                           children: [
-                                            const Text(
-                                              "الطلب: ",
-                                              style: TextStyle(
-                                                  fontWeight: FontWeight.bold),
-                                            ),
                                             const SizedBox(width: 6),
                                             if (order['cart'] != null &&
                                                 order['cart'].length > 0)

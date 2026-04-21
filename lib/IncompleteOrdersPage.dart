@@ -1151,6 +1151,7 @@ class _CaptainOrdersPageState extends State<CaptainOrdersPage> {
   }
 }
 
+// ─── مراحل الملاحة ───────────────────────────────────────
 enum _NavPhase {
   toPickup, // المرحلة 1: الكابتن ذاهب لمكان الانطلاق
   toDropoff, // المرحلة 2: الكابتن ذاهب لنقطة الوصول
@@ -1194,6 +1195,9 @@ class _MapPageState extends State<MapPage> with TickerProviderStateMixin {
   bool _is3DMode = false;
   bool _followUser = false;
   _NavPhase _phase = _NavPhase.toPickup;
+
+  // منع تكرار معالجة الوصول عند البقاء في نطاق 50م
+  bool _arrivalHandled = false;
 
   // مسافة اعتبار الوصول = 50 متر
   static const double _arrivalThresholdMeters = 50;
@@ -1314,7 +1318,8 @@ class _MapPageState extends State<MapPage> with TickerProviderStateMixin {
       from = _currentLocation;
       to = start;
     } else {
-      from = start;
+      // إذا start == null استخدم الموقع الحالي كنقطة انطلاق
+      from = start ?? _currentLocation;
       to = end;
     }
 
@@ -1341,6 +1346,7 @@ class _MapPageState extends State<MapPage> with TickerProviderStateMixin {
   // ─── فحص الوصول للنقطة المستهدفة ────────────────────────
   void _checkArrival() {
     if (_currentLocation == null) return;
+    if (_arrivalHandled) return; // منع التكرار
 
     final target = _phase == _NavPhase.toPickup ? start : end;
     if (target == null) return;
@@ -1352,18 +1358,37 @@ class _MapPageState extends State<MapPage> with TickerProviderStateMixin {
     );
 
     if (dist <= _arrivalThresholdMeters) {
+      setState(() => _arrivalHandled = true);
+
       if (_phase == _NavPhase.toPickup) {
-        setState(() => _phase = _NavPhase.toDropoff);
-        _loadRoute(_NavPhase.toDropoff);
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text(
-                "✅ وصلت لـ ${widget.startName}\n🧭 الآن توجّه إلى ${widget.endName}"),
-            duration: const Duration(seconds: 3),
-            backgroundColor: Colors.green,
-          ),
-        );
+        if (end != null) {
+          // وجهة نهائية موجودة → انتقل للمرحلة الثانية
+          setState(() {
+            _phase = _NavPhase.toDropoff;
+            _arrivalHandled = false; // أعد التفعيل للمرحلة الجديدة
+          });
+          _loadRoute(_NavPhase.toDropoff);
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text(
+                  "✅ وصلت لـ ${widget.startName}\n🧭 الآن توجّه إلى ${widget.endName}"),
+              duration: const Duration(seconds: 3),
+              backgroundColor: Colors.green,
+            ),
+          );
+        } else {
+          // لا توجد وجهة نهائية → أوقف الملاحة
+          _stopNavigation();
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text("✅ وصلت إلى ${widget.startName}"),
+              duration: const Duration(seconds: 3),
+              backgroundColor: Colors.green,
+            ),
+          );
+        }
       } else {
+        // وصل للوجهة النهائية
         _stopNavigation();
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
@@ -1388,17 +1413,26 @@ class _MapPageState extends State<MapPage> with TickerProviderStateMixin {
 
   // ─── بدء الملاحة ────────────────────────────────────────
   void _startNavigation() {
+    // تحديد المرحلة الأولى حسب البيانات المتاحة
+    final initialPhase =
+        start != null ? _NavPhase.toPickup : _NavPhase.toDropoff;
+
+    // الوجهة الأولى للعرض في الـ SnackBar
+    final firstDest = start != null ? widget.startName : widget.endName;
+
     setState(() {
       _isNavigating = true;
       _followUser = true;
-      _phase = _NavPhase.toPickup;
+      _phase = initialPhase;
+      _arrivalHandled = false;
     });
-    _loadRoute(_NavPhase.toPickup);
+
+    _loadRoute(initialPhase);
     _moveCamera();
 
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
-        content: Text("🧭 توجّه إلى ${widget.startName}"),
+        content: Text("🧭 توجّه إلى $firstDest"),
         duration: const Duration(seconds: 2),
         backgroundColor: Colors.blue,
       ),
@@ -1426,6 +1460,7 @@ class _MapPageState extends State<MapPage> with TickerProviderStateMixin {
       _followUser = false;
       _is3DMode = false;
       _phase = _NavPhase.toPickup;
+      _arrivalHandled = false;
     });
     _tiltAnimController.reverse();
     _mapController.rotate(0);
@@ -1594,45 +1629,27 @@ class _MapPageState extends State<MapPage> with TickerProviderStateMixin {
       appBar: _is3DMode
           ? null
           : AppBar(
-              titleSpacing: 0,
-              automaticallyImplyLeading:
-                  false, // مهم عشان ما يحط زر رجوع تلقائي
-
-              title: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  // 👈 الزر صار على اليسار
-                  if (_currentLocation != null && _isNavigating)
-                    IconButton(
-                      icon: Icon(
-                        _followUser ? Icons.gps_fixed : Icons.gps_not_fixed,
-                        color: _followUser ? Colors.blue : null,
-                      ),
-                      onPressed: () {
-                        setState(() => _followUser = !_followUser);
-                        if (_followUser) _moveCamera();
-                      },
-                      tooltip: "تتبع موقعي",
-                    )
-                  else
-                    SizedBox(width: 48),
-
-                  // 🧠 العنوان بالنص
-                  Expanded(
-                    child: Text(
-                      _isNavigating
-                          ? (_phase == _NavPhase.toPickup
-                              ? "إلى: ${widget.startName}"
-                              : "إلى: ${widget.endName}")
-                          : "الموقع على الخريطة",
-                      textAlign: TextAlign.center,
-                    ),
-                  ),
-
-                  // 👉 فراغ بدل مكانه القديم (للتوازن)
-                  SizedBox(width: 48),
-                ],
+              title: Text(
+                _isNavigating
+                    ? (_phase == _NavPhase.toPickup
+                        ? "إلى: ${widget.startName}"
+                        : "إلى: ${widget.endName}")
+                    : "الموقع على الخريطة",
               ),
+              actions: [
+                if (_currentLocation != null && _isNavigating)
+                  IconButton(
+                    icon: Icon(
+                      _followUser ? Icons.gps_fixed : Icons.gps_not_fixed,
+                      color: _followUser ? Colors.blue : null,
+                    ),
+                    onPressed: () {
+                      setState(() => _followUser = !_followUser);
+                      if (_followUser) _moveCamera();
+                    },
+                    tooltip: "تتبع موقعي",
+                  ),
+              ],
             ),
       body: Stack(
         children: [
@@ -1656,7 +1673,7 @@ class _MapPageState extends State<MapPage> with TickerProviderStateMixin {
           if (_isNavigating)
             Positioned(
               top: _is3DMode ? 130 : 90,
-              right: 150,
+              left: 140,
               child: _PhaseBadge(phase: _phase),
             ),
 
@@ -1842,9 +1859,8 @@ class _PhaseBadge extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
       decoration: BoxDecoration(
-        color: isPickup
-            ? const Color.fromARGB(255, 253, 11, 11)
-            : const Color.fromARGB(255, 110, 243, 33),
+        color:
+            isPickup ? Colors.orange : const Color.fromARGB(255, 16, 211, 26),
         borderRadius: BorderRadius.circular(20),
         boxShadow: [
           BoxShadow(
